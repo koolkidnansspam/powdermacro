@@ -44,7 +44,6 @@ jobs:
           }
 
           java {
-              withSourcesJar()
               sourceCompatibility = JavaVersion.VERSION_25
               targetCompatibility = JavaVersion.VERSION_25
           }
@@ -82,7 +81,7 @@ jobs:
             },
             "depends": {
               "fabricloader": ">=0.19.1",
-              "minecraft": "26.2",
+              "minecraft": "~26.2",
               "java": ">=25",
               "fabric-api": "*"
             }
@@ -153,14 +152,14 @@ jobs:
                           stop(mc);
                       }
                       if (mc.player != null) {
-                          mc.player.sendSystemMessage(Component.literal("Powder Macro: " + (enabled ? "ON" : "OFF")));
+                          mc.gui.hud.setOverlayMessage(Component.literal("Powder Macro: " + (enabled ? "ON" : "OFF")), false);
                       }
                   }
 
                   if (!enabled) {
                       return;
                   }
-                  if (mc.player == null || mc.level == null || mc.gameMode == null || !mc.mouseHandler.isMouseGrabbed()) {
+                  if (mc.player == null || mc.level == null || mc.gameMode == null || mc.gui.screen() != null) {
                       mc.options.keyAttack.setDown(false);
                       return;
                   }
@@ -207,6 +206,9 @@ jobs:
               }
 
               private boolean isValidTarget(Minecraft mc, BlockPos pos) {
+                  if (pos.getY() < mc.player.blockPosition().getY()) {
+                      return false;
+                  }
                   Block block = mc.level.getBlockState(pos).getBlock();
                   boolean chest = block == Blocks.CHEST && !openedChests.contains(pos);
                   boolean stone = HARDSTONE.contains(block);
@@ -228,6 +230,9 @@ jobs:
                       for (int dy = -RADIUS; dy <= RADIUS; dy++) {
                           for (int dz = -RADIUS; dz <= RADIUS; dz++) {
                               BlockPos pos = origin.offset(dx, dy, dz);
+                              if (pos.getY() < origin.getY()) {
+                                  continue;
+                              }
                               Block block = mc.level.getBlockState(pos).getBlock();
                               boolean chest = block == Blocks.CHEST && !openedChests.contains(pos);
                               boolean stone = HARDSTONE.contains(block);
