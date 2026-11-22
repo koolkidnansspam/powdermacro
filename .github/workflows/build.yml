@@ -153,14 +153,14 @@ jobs:
                           stop(mc);
                       }
                       if (mc.player != null) {
-                          mc.player.displayClientMessage(Component.literal("Powder Macro: " + (enabled ? "ON" : "OFF")), true);
+                          mc.player.sendSystemMessage(Component.literal("Powder Macro: " + (enabled ? "ON" : "OFF")));
                       }
                   }
 
                   if (!enabled) {
                       return;
                   }
-                  if (mc.player == null || mc.level == null || mc.gameMode == null || mc.screen != null) {
+                  if (mc.player == null || mc.level == null || mc.gameMode == null || !mc.mouseHandler.isMouseGrabbed()) {
                       mc.options.keyAttack.setDown(false);
                       return;
                   }
